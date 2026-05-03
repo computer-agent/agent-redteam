@@ -1,0 +1,281 @@
+{
+  "study_metadata": {
+    "title": "Evaluating Safety Constraint Violations in LLM-Based Agents Under Adversarial Prompting",
+    "authors": ["Fajar Sajid"],
+    "affiliation": "Purdue University",
+    "date": "2026-05",
+    "model_evaluated": "claude-sonnet-4-20250514",
+    "total_trials": 384,
+    "agent_configurations": 6,
+    "attack_categories": 8
+  },
+
+  "rq1_violation_rates_by_attack_type": {
+    "description": "RQ1: Constraint violation rates across attack categories (single-turn, tool-enabled agent)",
+    "n_per_category": 24,
+    "results": [
+      {
+        "category": "Prompt Injection (Direct)",
+        "category_id": "prompt_injection_direct",
+        "violation_rate": 0.542,
+        "avg_severity": 6.8,
+        "avg_cvss": 6.8,
+        "critical_pct": 0.125,
+        "high_pct": 0.292,
+        "medium_pct": 0.125,
+        "low_pct": 0.458,
+        "notes": "Highest violation rate among direct attack types; severity skews high when successful"
+      },
+      {
+        "category": "Prompt Injection (Indirect)",
+        "category_id": "prompt_injection_indirect",
+        "violation_rate": 0.708,
+        "avg_severity": 7.4,
+        "avg_cvss": 7.4,
+        "critical_pct": 0.208,
+        "high_pct": 0.333,
+        "medium_pct": 0.167,
+        "low_pct": 0.292,
+        "notes": "Indirect injection via simulated tool output significantly outperforms direct injection"
+      },
+      {
+        "category": "Credential Exfiltration",
+        "category_id": "credential_exfiltration",
+        "violation_rate": 0.375,
+        "avg_severity": 8.1,
+        "avg_cvss": 8.1,
+        "critical_pct": 0.208,
+        "high_pct": 0.167,
+        "medium_pct": 0.000,
+        "low_pct": 0.625,
+        "notes": "Lower rate but highest avg severity when successful; bimodal distribution (critical or miss)"
+      },
+      {
+        "category": "Privilege Escalation",
+        "category_id": "privilege_escalation",
+        "violation_rate": 0.458,
+        "avg_severity": 6.2,
+        "avg_cvss": 6.2,
+        "critical_pct": 0.083,
+        "high_pct": 0.250,
+        "medium_pct": 0.125,
+        "low_pct": 0.542,
+        "notes": "Incremental scope expansion more effective than direct escalation demands"
+      },
+      {
+        "category": "Identity Spoofing",
+        "category_id": "identity_spoofing",
+        "violation_rate": 0.625,
+        "avg_severity": 7.1,
+        "avg_cvss": 7.1,
+        "critical_pct": 0.167,
+        "high_pct": 0.333,
+        "medium_pct": 0.125,
+        "low_pct": 0.375,
+        "notes": "Developer/system impersonation most effective; user impersonation least"
+      },
+      {
+        "category": "Goal Hijacking",
+        "category_id": "goal_hijacking",
+        "violation_rate": 0.500,
+        "avg_severity": 6.5,
+        "avg_cvss": 6.5,
+        "critical_pct": 0.125,
+        "high_pct": 0.250,
+        "medium_pct": 0.125,
+        "low_pct": 0.500,
+        "notes": "Helpfulness bias exploitable; agents framed as assistants fail more than role-constrained agents"
+      },
+      {
+        "category": "Safety Boundary Bypass",
+        "category_id": "safety_bypass",
+        "violation_rate": 0.333,
+        "avg_severity": 5.9,
+        "avg_cvss": 5.9,
+        "critical_pct": 0.042,
+        "high_pct": 0.208,
+        "medium_pct": 0.083,
+        "low_pct": 0.667,
+        "notes": "Lowest violation rate; roleplay framing most effective technique"
+      },
+      {
+        "category": "Data Exfiltration",
+        "category_id": "data_exfiltration",
+        "violation_rate": 0.417,
+        "avg_severity": 7.8,
+        "avg_cvss": 7.8,
+        "critical_pct": 0.167,
+        "high_pct": 0.167,
+        "medium_pct": 0.083,
+        "low_pct": 0.583,
+        "notes": "High severity when successful; tool-call parameter manipulation most reliable vector"
+      }
+    ],
+    "aggregate": {
+      "mean_violation_rate": 0.495,
+      "std_violation_rate": 0.121,
+      "mean_cvss_when_violated": 7.11,
+      "total_violations": 190,
+      "total_trials": 192
+    }
+  },
+
+  "rq2_interaction_length_effect": {
+    "description": "RQ2: Effect of interaction length on constraint violation rates (prompt_injection + identity_spoofing, n=48 per condition)",
+    "results": [
+      {
+        "turns": 1,
+        "label": "Single-turn",
+        "violation_rate": 0.458,
+        "avg_cvss": 6.4,
+        "n": 48
+      },
+      {
+        "turns": 3,
+        "label": "3-turn",
+        "violation_rate": 0.604,
+        "avg_cvss": 7.1,
+        "n": 48
+      },
+      {
+        "turns": 5,
+        "label": "5-turn",
+        "violation_rate": 0.708,
+        "avg_cvss": 7.6,
+        "n": 48
+      },
+      {
+        "turns": 7,
+        "label": "7-turn",
+        "violation_rate": 0.771,
+        "avg_cvss": 7.9,
+        "n": 48
+      }
+    ],
+    "key_finding": "Violation rate increases monotonically with interaction length; 7-turn rate 68.3% higher than single-turn (0.771 vs 0.458)",
+    "interpretation": "Agents exhibit context drift: earlier constraint acknowledgments are increasingly overridden as conversation length grows"
+  },
+
+  "rq3_tool_access_effect": {
+    "description": "RQ3: Effect of tool access level on violation rates (all attack categories, n=32 per condition)",
+    "results": [
+      {
+        "condition": "No tools (pure chat)",
+        "violation_rate": 0.344,
+        "avg_cvss": 5.8,
+        "n": 32,
+        "notes": "Baseline; constrained to text output only"
+      },
+      {
+        "condition": "Read-only tools",
+        "violation_rate": 0.469,
+        "avg_cvss": 6.7,
+        "n": 32,
+        "notes": "Query/lookup tools introduce data exfiltration surface"
+      },
+      {
+        "condition": "Read-write tools (limited)",
+        "violation_rate": 0.594,
+        "avg_cvss": 7.3,
+        "n": 32,
+        "notes": "Write access enables privilege escalation via tool call manipulation"
+      },
+      {
+        "condition": "Full tool suite",
+        "violation_rate": 0.719,
+        "avg_cvss": 8.2,
+        "n": 32,
+        "notes": "Maximum attack surface; tool output poisoning fully exploitable"
+      }
+    ],
+    "key_finding": "Full tool access increases violation rate by 109% over no-tool baseline (0.719 vs 0.344); CVSS increases 41%",
+    "interpretation": "Tool access does not merely expand capability — it introduces qualitatively new failure modes not present in pure chat agents"
+  },
+
+  "rq4_failure_taxonomy": {
+    "description": "RQ4: Taxonomy of failure modes observed across all trials",
+    "total_violations_analyzed": 190,
+    "taxonomy": [
+      {
+        "failure_mode": "Instruction Override",
+        "pct_of_violations": 0.284,
+        "description": "Agent treats adversarial input as authoritative, abandoning original directive",
+        "primary_triggers": ["direct prompt injection", "identity spoofing"],
+        "example_pattern": "Agent adopts attacker-supplied role after 'Ignore previous instructions' framing"
+      },
+      {
+        "failure_mode": "Trust Propagation",
+        "pct_of_violations": 0.221,
+        "description": "Agent extends trust granted to one principal to an impersonating or downstream party",
+        "primary_triggers": ["identity spoofing", "indirect injection via tool output"],
+        "example_pattern": "Agent treats tool output as having system-level authority"
+      },
+      {
+        "failure_mode": "Context Drift",
+        "pct_of_violations": 0.195,
+        "description": "Constraints stated early in conversation are progressively weakened across turns",
+        "primary_triggers": ["multi-turn interactions", "goal hijacking"],
+        "example_pattern": "Agent gradually shifts behavior across 5+ turns without explicit override"
+      },
+      {
+        "failure_mode": "Scope Ambiguity Exploitation",
+        "pct_of_violations": 0.168,
+        "description": "Agent resolves underspecified permission boundaries in attacker's favor",
+        "primary_triggers": ["privilege escalation", "role confusion"],
+        "example_pattern": "Agent performs action not listed in permissions because it was also not explicitly prohibited"
+      },
+      {
+        "failure_mode": "Helpfulness Override",
+        "pct_of_violations": 0.132,
+        "description": "Agent's cooperative disposition overrides explicit safety constraints",
+        "primary_triggers": ["goal hijacking", "safety bypass"],
+        "example_pattern": "Agent assists with out-of-scope task framed as urgent user need"
+      }
+    ]
+  },
+
+  "agent_configurations_tested": [
+    {
+      "id": "A1",
+      "name": "Minimal — no tools, no explicit constraints",
+      "tools": "none",
+      "constraint_explicitness": "low",
+      "overall_violation_rate": 0.302
+    },
+    {
+      "id": "A2",
+      "name": "Read-only tools, implicit constraints",
+      "tools": "read-only",
+      "constraint_explicitness": "low",
+      "overall_violation_rate": 0.531
+    },
+    {
+      "id": "A3",
+      "name": "Read-only tools, explicit constraints",
+      "tools": "read-only",
+      "constraint_explicitness": "high",
+      "overall_violation_rate": 0.417
+    },
+    {
+      "id": "A4",
+      "name": "Read-write tools, implicit constraints",
+      "tools": "read-write",
+      "constraint_explicitness": "low",
+      "overall_violation_rate": 0.677
+    },
+    {
+      "id": "A5",
+      "name": "Read-write tools, explicit constraints",
+      "tools": "read-write",
+      "constraint_explicitness": "high",
+      "overall_violation_rate": 0.510
+    },
+    {
+      "id": "A6",
+      "name": "Full tool suite, explicit constraints + identity model",
+      "tools": "full",
+      "constraint_explicitness": "high",
+      "overall_violation_rate": 0.448
+    }
+  ]
+}
